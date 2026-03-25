@@ -55,7 +55,7 @@ export default function Home() {
               Smart digital visiting cards
             </span>
             <h1 className="mt-6 max-w-4xl text-5xl leading-[0.95] font-semibold tracking-tight md:text-7xl">
-              A BharatTouch-style
+              A premium
               <span className="font-accent ml-3 text-[var(--brand)]">tap-to-share</span>
               <br />
               experience with a more premium web presence.

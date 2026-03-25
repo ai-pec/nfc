@@ -2,7 +2,7 @@
 
 This project now includes:
 
-- a BharatTouch-inspired public marketing site
+- a premium public marketing site for NFC-powered digital profiles
 - Supabase Auth wiring for email/password and Google sign-in
 - Supabase-backed app user sync and portfolio bootstrap
 - a protected dashboard and low-profile admin route

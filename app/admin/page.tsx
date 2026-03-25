@@ -1,4 +1,7 @@
+import Link from "next/link";
+import { AdminAccountActions } from "@/components/admin-account-actions";
 import { requireAdmin } from "@/lib/auth-server";
+import { getPortfolioPublicUrl } from "@/lib/portfolio-url";
 import { getSiteMetrics } from "@/lib/supabase-queries";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -7,7 +10,7 @@ export default async function AdminPage() {
   const metrics = await getSiteMetrics();
   const { data: accounts } = await supabaseAdmin
     .from("users")
-    .select("uid, email, name, role, account_status")
+    .select("uid, email, name, role, account_status, portfolios(uid, slug, published, site_paused)")
     .order("created_at", { ascending: false })
     .limit(8);
 
@@ -35,8 +38,8 @@ export default async function AdminPage() {
             <div>New contact requests: <span className="font-semibold text-[var(--foreground)]">{metrics.newLeads}</span></div>
           </article>
           <article className="page-card px-5 py-4 text-sm leading-7 text-[var(--muted)]">
-            Next step: wire this route to Better Auth session checks and the Supabase `profiles.role = &apos;admin&apos;`
-            guard.
+            This route is protected through your Supabase-backed app session and admin role checks, with pause and
+            moderation controls ready to expand.
           </article>
           <article className="page-card px-5 py-4 text-sm leading-7 text-[var(--muted)]">
             Run the SQL in <span className="font-semibold text-[var(--foreground)]">docs/supabase-admin-migration.sql</span>
@@ -46,13 +49,36 @@ export default async function AdminPage() {
             <p className="text-sm font-semibold tracking-[0.14em] uppercase text-[var(--brand-deep)]">Recent accounts</p>
             <div className="mt-4 space-y-3 text-sm text-[var(--muted)]">
               {(accounts ?? []).map((account) => (
-                <div key={account.uid} className="rounded-2xl border border-[var(--line)] bg-white/70 px-4 py-3">
-                  <p className="font-semibold text-[var(--foreground)]">{account.name ?? "Unnamed user"}</p>
-                  <p className="mt-1">{account.email}</p>
-                  <p className="mt-1 uppercase tracking-[0.14em] text-xs">
-                    {account.role} / {account.account_status}
-                  </p>
-                </div>
+                (() => {
+                  const portfolio = account.portfolios?.[0];
+
+                  return (
+                    <div key={account.uid} className="rounded-2xl border border-[var(--line)] bg-white/70 px-4 py-3">
+                      <p className="font-semibold text-[var(--foreground)]">{account.name ?? "Unnamed user"}</p>
+                      <p className="mt-1">{account.email}</p>
+                      <p className="mt-1 break-all text-xs">
+                        {portfolio?.slug ? (
+                          <Link
+                            href={getPortfolioPublicUrl({ slug: portfolio.slug }) ?? "#"}
+                            target="_blank"
+                            className="font-medium text-[var(--brand-deep)]"
+                          >
+                            {getPortfolioPublicUrl({ slug: portfolio.slug })}
+                          </Link>
+                        ) : (
+                          "Portfolio URL not generated yet"
+                        )}
+                      </p>
+                      <p className="mt-1 uppercase tracking-[0.14em] text-xs">
+                        {account.role} / {account.account_status}
+                      </p>
+                      <p className="mt-1 uppercase tracking-[0.14em] text-xs">
+                        {portfolio?.published ? "Published" : "Draft"} / {portfolio?.site_paused ? "Frozen" : "Live"}
+                      </p>
+                      <AdminAccountActions uid={account.uid} sitePaused={Boolean(portfolio?.site_paused)} />
+                    </div>
+                  );
+                })()
               ))}
             </div>
           </article>

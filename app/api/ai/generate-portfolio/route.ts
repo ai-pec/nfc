@@ -9,7 +9,7 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await requireAuth();
+  await requireAuth();
 
   const body = await request.json();
   const parsedBody = requestSchema.safeParse(body);
