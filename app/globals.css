@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7efe6;
+  --foreground: #16110d;
+  --surface: rgba(255, 248, 242, 0.76);
+  --surface-strong: #fff7f1;
+  --muted: #6f6259;
+  --line: rgba(109, 87, 74, 0.18);
+  --brand: #bc5a2d;
+  --brand-deep: #7e3110;
+  --brand-soft: #f3c8af;
+  --brand-strong: #8f3a16;
+  --success: #245b45;
+  --shadow: 0 24px 80px rgba(76, 41, 21, 0.14);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  --font-mono: "Courier New", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(243, 200, 175, 0.58), transparent 26%),
+    radial-gradient(circle at 85% 10%, rgba(188, 90, 45, 0.14), transparent 22%),
+    linear-gradient(180deg, #fffaf5 0%, #f7efe6 48%, #f5eadf 100%);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(188, 90, 45, 0.18);
+}
+
+.font-accent {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.glass-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+}
+
+.section-shell {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.eyebrow {
+  color: var(--brand-deep);
+  background: rgba(188, 90, 45, 0.1);
+  border: 1px solid rgba(188, 90, 45, 0.16);
+}
+
+.grid-lines {
+  background-image:
+    linear-gradient(rgba(126, 49, 16, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 49, 16, 0.08) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.94), transparent);
+}
+
+.hero-orb {
+  filter: blur(12px);
+  animation: drift 10s ease-in-out infinite alternate;
+}
+
+.fade-up {
+  animation: fadeUp 0.8s ease-out both;
+}
+
+.fade-up-delay {
+  animation: fadeUp 1s ease-out 0.18s both;
+}
+
+.page-hero {
+  padding-top: 3rem;
+}
+
+.page-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 251, 247, 0.82);
+  border-radius: 1.5rem;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(18px, -14px, 0) scale(1.05);
+  }
+}
+
+@media (max-width: 768px) {
+  .section-shell {
+    width: min(100% - 1.25rem, 1180px);
+  }
 }

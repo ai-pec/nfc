@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NFC Portfolio Platform
 
-## Getting Started
+This project now includes:
 
-First, run the development server:
+- a BharatTouch-inspired public marketing site
+- Supabase Auth wiring for email/password and Google sign-in
+- Supabase-backed app user sync and portfolio bootstrap
+- a protected dashboard and low-profile admin route
+- AI portfolio blueprint generation with fixed brand/system rules
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Main routes
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `/`
+- `/about`
+- `/buy`
+- `/contact`
+- `/login`
+- `/signup`
+- `/dashboard`
+- `/admin`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Important docs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `docs/supabase-admin-migration.sql`
+- `docs/supabase-storage-plan.md`
+- `docs/ai-portfolio-rules.md`
 
-## Learn More
+## Required environment
 
-To learn more about Next.js, take a look at the following resources:
+- `NEXT_PUBLIC_SUPABASE_PROJECT_ID`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `DATABASE_URL`
+- `ADMIN_EMAILS`
+- `DEEPSEEK_API_KEY` for live AI generation
+- `DEEPSEEK_MODEL` optional
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Status
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Supabase auth server/client wiring is in the app
+- sign-up/sign-in syncs into your app tables through Supabase-backed user sync
+- dashboard AI generation is wired to your portfolio row
+- homepage/admin metrics read from Supabase
+- lint and TypeScript checks pass
 
-## Deploy on Vercel
+## Next required step in Supabase
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Run these SQL files in order:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. `docs/supabase-admin-migration.sql`
