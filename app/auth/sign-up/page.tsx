@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { AuthForm } from "@/components/auth-form";
+import { getAuthSession } from "@/lib/auth-server";
+import { redirect } from "next/navigation";
 
 type SignUpPageProps = {
   searchParams?: Promise<{
@@ -10,6 +12,11 @@ type SignUpPageProps = {
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const params = await searchParams;
   const nextPath = params?.next ?? "/onboarding";
+  const session = await getAuthSession();
+
+  if (session?.user) {
+    redirect(nextPath);
+  }
 
   return (
     <main className="section-shell page-hero flex-1">

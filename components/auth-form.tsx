@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabaseConfig } from "@/lib/supabase-config";
 import { authClient } from "@/lib/auth-client";
 
@@ -14,7 +13,6 @@ type AuthFormProps = {
 
 export function AuthForm({ mode, nextPath }: AuthFormProps) {
   const normalizedMode = mode === "login" ? "sign-in" : mode === "signup" ? "sign-up" : mode;
-  const router = useRouter();
   const redirectPath = nextPath ?? (normalizedMode === "sign-in" ? "/dashboard" : "/onboarding");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +59,7 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
       return;
     }
 
-    router.replace(redirectPath);
-    router.refresh();
+    window.location.assign(redirectPath);
   }
 
   async function handleGoogleAuth() {

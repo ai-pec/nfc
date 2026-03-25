@@ -13,6 +13,27 @@ export default async function AdminPage() {
     .select("uid, email, name, role, account_status, portfolios(uid, slug, published, site_paused)")
     .order("created_at", { ascending: false })
     .limit(8);
+  const portfolioUids = (accounts ?? []).flatMap((account) => account.portfolios?.map((portfolio) => portfolio.uid) ?? []);
+  const buildLookup = new Map<string, { status: string; requested_at: string | null }>();
+
+  if (portfolioUids.length > 0) {
+    const { data: builds, error: buildsError } = await supabaseAdmin
+      .from("portfolio_builds")
+      .select("portfolio_uid, status, requested_at")
+      .in("portfolio_uid", portfolioUids)
+      .order("requested_at", { ascending: false });
+
+    if (!buildsError && builds) {
+      builds.forEach((build) => {
+        if (!buildLookup.has(build.portfolio_uid)) {
+          buildLookup.set(build.portfolio_uid, {
+            status: build.status,
+            requested_at: build.requested_at,
+          });
+        }
+      });
+    }
+  }
 
   return (
     <main className="section-shell page-hero flex-1">
@@ -74,6 +95,9 @@ export default async function AdminPage() {
                       </p>
                       <p className="mt-1 uppercase tracking-[0.14em] text-xs">
                         {portfolio?.published ? "Published" : "Draft"} / {portfolio?.site_paused ? "Frozen" : "Live"}
+                      </p>
+                      <p className="mt-1 uppercase tracking-[0.14em] text-xs">
+                        Build: {portfolio ? buildLookup.get(portfolio.uid)?.status ?? "not-run" : "not-ready"}
                       </p>
                       <AdminAccountActions uid={account.uid} sitePaused={Boolean(portfolio?.site_paused)} />
                     </div>

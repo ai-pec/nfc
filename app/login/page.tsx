@@ -1,4 +1,6 @@
 import { AuthForm } from "@/components/auth-form";
+import { getAuthSession } from "@/lib/auth-server";
+import { redirect } from "next/navigation";
 
 type LoginPageProps = {
   searchParams?: Promise<{
@@ -9,6 +11,11 @@ type LoginPageProps = {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const nextPath = params?.next ?? "/dashboard";
+  const session = await getAuthSession();
+
+  if (session?.user) {
+    redirect(nextPath);
+  }
 
   return (
     <main className="section-shell page-hero flex-1">
