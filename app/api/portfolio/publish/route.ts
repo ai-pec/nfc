@@ -37,6 +37,17 @@ export async function POST() {
     return NextResponse.json({ error: result.error.message }, { status: 500 });
   }
 
+  await supabaseAdmin
+    .from("portfolio_builds")
+    .update({
+      stage: "publish",
+      public_url: publishedUrl,
+      published_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("portfolio_uid", appUser.uid)
+    .eq("status", "completed");
+
   const vercelResult = await queueVercelPortfolioDeployment({
     slug: portfolio.slug,
     portfolioUid: appUser.uid,

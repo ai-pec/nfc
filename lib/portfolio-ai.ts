@@ -41,7 +41,7 @@ export const portfolioBlueprintSchema = z.object({
   source: z.string(),
 });
 
-type PortfolioRow = {
+export type PortfolioRow = {
   uid: string;
   name: string;
   email: string | null;
@@ -56,9 +56,12 @@ type PortfolioRow = {
   services: string[] | null;
   experience: string[] | null;
   education: string[] | null;
+  gallery?: string[] | null;
   website: string | null;
   theme: string | null;
   slug: string;
+  address?: string | null;
+  meeting_link?: string | null;
 };
 
 function buildFallbackBlueprint(portfolio: PortfolioRow, stylePrompt: string) {
@@ -104,7 +107,7 @@ function buildFallbackBlueprint(portfolio: PortfolioRow, stylePrompt: string) {
   });
 }
 
-function buildPrompt(portfolio: PortfolioRow, stylePrompt: string) {
+function buildPrompt(portfolio: PortfolioRow, stylePrompt: string, intakePayload?: Record<string, unknown>) {
   return [
     "You are designing a professional NFC-powered portfolio blueprint.",
     "You must return JSON only.",
@@ -116,6 +119,10 @@ function buildPrompt(portfolio: PortfolioRow, stylePrompt: string) {
     `Services: ${(portfolio.services ?? []).join(", ") || "Not specified"}`,
     `Experience: ${(portfolio.experience ?? []).join(", ") || "Not specified"}`,
     `Education: ${(portfolio.education ?? []).join(", ") || "Not specified"}`,
+    `Gallery assets: ${(portfolio.gallery ?? []).join(", ") || "Not specified"}`,
+    `Address: ${portfolio.address ?? "Not specified"}`,
+    `Meeting link: ${portfolio.meeting_link ?? "Not specified"}`,
+    `Extra onboarding context: ${intakePayload ? JSON.stringify(intakePayload) : "Not specified"}`,
     "Non-negotiable site rules:",
     ...PORTFOLIO_INVARIANTS.map((item, index) => `${index + 1}. ${item}`),
     "Global portfolio system contract:",
@@ -127,7 +134,11 @@ function buildPrompt(portfolio: PortfolioRow, stylePrompt: string) {
   ].join("\n");
 }
 
-async function generateWithDeepSeek(portfolio: PortfolioRow, stylePrompt: string) {
+async function generateWithDeepSeek(
+  portfolio: PortfolioRow,
+  stylePrompt: string,
+  intakePayload?: Record<string, unknown>,
+) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
 
   if (!apiKey) {
@@ -153,7 +164,7 @@ async function generateWithDeepSeek(portfolio: PortfolioRow, stylePrompt: string
         },
         {
           role: "user",
-          content: buildPrompt(portfolio, stylePrompt),
+          content: buildPrompt(portfolio, stylePrompt, intakePayload),
         },
       ],
     }),
@@ -176,18 +187,22 @@ async function generateWithDeepSeek(portfolio: PortfolioRow, stylePrompt: string
   });
 }
 
-export async function generatePortfolioBlueprint(portfolio: PortfolioRow, stylePrompt: string) {
-  const blueprint = await generateWithDeepSeek(portfolio, stylePrompt);
+export async function generatePortfolioBlueprint(
+  portfolio: PortfolioRow,
+  stylePrompt: string,
+  intakePayload?: Record<string, unknown>,
+) {
+  const blueprint = await generateWithDeepSeek(portfolio, stylePrompt, intakePayload);
 
   const updateResult = await supabaseAdmin
     .from("portfolios")
     .update({
       theme: blueprint.theme,
       headline: blueprint.hero.headline,
-      about: blueprint.summary,
       canvas: {
         generatedAt: new Date().toISOString(),
         stylePrompt,
+        intakePayload: intakePayload ?? null,
         invariants: PORTFOLIO_INVARIANTS,
         contract: PORTFOLIO_SYSTEM_CONTRACT,
         blueprint,

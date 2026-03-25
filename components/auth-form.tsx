@@ -18,11 +18,13 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
   const redirectPath = nextPath ?? (normalizedMode === "sign-in" ? "/dashboard" : "/onboarding");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
     setError(null);
+    setInfo(null);
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "");
@@ -39,7 +41,7 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
                 name,
                 full_name: name,
               },
-              emailRedirectTo: `${window.location.origin}/auth/sign-in?next=${encodeURIComponent(redirectPath)}`,
+              emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
             },
           })
         : await authClient.auth.signInWithPassword({
@@ -54,13 +56,19 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
       return;
     }
 
-    router.push(redirectPath);
+    if (normalizedMode === "sign-up" && !result.data.session) {
+      setInfo("Account created. Please check your email and open the confirmation link to finish sign-in.");
+      return;
+    }
+
+    router.replace(redirectPath);
     router.refresh();
   }
 
   async function handleGoogleAuth() {
     setPending(true);
     setError(null);
+    setInfo(null);
 
     const origin = window.location.origin;
     const callbackURL = `${origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`;
@@ -126,6 +134,7 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
       </div>
 
       {error ? <p className="mt-4 text-sm text-[var(--brand-deep)]">{error}</p> : null}
+      {info ? <p className="mt-4 text-sm text-[var(--muted)]">{info}</p> : null}
 
       <button
         type="submit"

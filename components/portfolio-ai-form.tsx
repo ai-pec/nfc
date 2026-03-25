@@ -26,6 +26,7 @@ export function PortfolioAiForm({ defaultPrompt }: PortfolioAiFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [blueprint, setBlueprint] = useState<GeneratedBlueprint | null>(null);
+  const [buildMeta, setBuildMeta] = useState<{ id: string; status: string; publicUrl: string | null } | null>(null);
 
   async function handleGenerate() {
     setLoading(true);
@@ -47,6 +48,11 @@ export function PortfolioAiForm({ defaultPrompt }: PortfolioAiFormProps) {
       return;
     }
 
+    setBuildMeta({
+      id: data.build?.id ?? "unknown",
+      status: data.build?.status ?? "completed",
+      publicUrl: data.publicUrl ?? null,
+    });
     setBlueprint(data.blueprint);
   }
 
@@ -80,6 +86,23 @@ export function PortfolioAiForm({ defaultPrompt }: PortfolioAiFormProps) {
       </button>
 
       {error ? <p className="mt-4 text-sm text-[var(--brand-deep)]">{error}</p> : null}
+
+      {buildMeta ? (
+        <div className="mt-4 page-card px-4 py-4 text-sm leading-6 text-[var(--muted)]">
+          Build ID: <span className="font-semibold text-[var(--foreground)]">{buildMeta.id}</span>
+          <br />
+          Status: <span className="font-semibold text-[var(--foreground)]">{buildMeta.status}</span>
+          <br />
+          Public URL:{" "}
+          {buildMeta.publicUrl ? (
+            <a href={buildMeta.publicUrl} target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-deep)]">
+              {buildMeta.publicUrl}
+            </a>
+          ) : (
+            "Will appear after publishing"
+          )}
+        </div>
+      ) : null}
 
       {blueprint ? (
         <div className="mt-6 space-y-4">

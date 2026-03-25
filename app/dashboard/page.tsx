@@ -2,7 +2,9 @@ import { PortfolioAiForm } from "@/components/portfolio-ai-form";
 import { PortfolioPublishControls } from "@/components/portfolio-publish-controls";
 import { SignOutButton } from "@/components/sign-out-button";
 import { requireAuth, getCurrentAppUser } from "@/lib/auth-server";
+import { getLatestPortfolioBuild } from "@/lib/portfolio-builds";
 import { extractBlueprint } from "@/lib/portfolio-render";
+import { getPortfolioPublicUrl } from "@/lib/portfolio-url";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export default async function DashboardPage() {
@@ -18,6 +20,8 @@ export default async function DashboardPage() {
   if (error) {
     throw error;
   }
+
+  const latestBuild = portfolio && appUser?.uid ? await getLatestPortfolioBuild(appUser.uid) : null;
 
   const blueprint = portfolio ? extractBlueprint({
     uid: appUser?.uid ?? "",
@@ -73,6 +77,7 @@ export default async function DashboardPage() {
               <p className="mt-2 text-sm text-[var(--muted)]">
                 Status: {portfolio?.published ? "Published" : "Draft"} {portfolio?.site_paused ? "(Paused)" : ""}
               </p>
+              <p className="mt-2 text-sm text-[var(--muted)]">Latest build: {latestBuild?.status ?? "No build yet"}</p>
               <div className="mt-5">
                 <PortfolioPublishControls
                   published={Boolean(portfolio?.published)}
@@ -81,7 +86,7 @@ export default async function DashboardPage() {
               </div>
               {portfolio?.slug ? (
                 <a
-                  href={`/p/${portfolio.slug}`}
+                  href={getPortfolioPublicUrl({ slug: portfolio.slug }) ?? `/p/${portfolio.slug}`}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-4 inline-flex text-sm font-semibold text-[var(--brand-deep)]"
@@ -94,6 +99,12 @@ export default async function DashboardPage() {
 
           <section>
             <PortfolioAiForm defaultPrompt="Make it sleek, premium, mobile-first, and easy to trust within a few seconds." />
+            <article className="page-card mt-6 px-5 py-5 text-sm leading-7 text-[var(--muted)]">
+              Shared onboarding link: <span className="font-semibold text-[var(--foreground)]">/onboarding</span>
+              <br />
+              Send every signed-in user there first. That route saves their profile data, creates a build record, and
+              then runs the AI portfolio generation flow.
+            </article>
             {blueprint ? (
               <article className="page-card mt-6 px-5 py-5">
                 <p className="text-sm font-semibold tracking-[0.14em] uppercase text-[var(--brand-deep)]">Latest generated direction</p>

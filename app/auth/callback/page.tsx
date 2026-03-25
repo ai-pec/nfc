@@ -13,21 +13,30 @@ export default function AuthCallbackPage() {
     async function finishSignIn() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
+      const tokenHash = params.get("token_hash");
+      const authType = params.get("type");
       const nextPath = params.get("next") || "/dashboard";
 
-      if (!code) {
-        router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+      const recoveryPath = `/auth/sign-in?next=${encodeURIComponent(nextPath)}`;
+
+      if (!code && !(tokenHash && authType)) {
+        router.replace(recoveryPath);
         return;
       }
 
-      const { error } = await authClient.auth.exchangeCodeForSession(code);
+      const { error } = code
+        ? await authClient.auth.exchangeCodeForSession(code)
+        : await authClient.auth.verifyOtp({
+            token_hash: tokenHash!,
+            type: authType as "signup" | "recovery" | "email_change" | "invite" | "magiclink",
+          });
 
       if (cancelled) {
         return;
       }
 
       if (error) {
-        router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+        router.replace(recoveryPath);
         return;
       }
 

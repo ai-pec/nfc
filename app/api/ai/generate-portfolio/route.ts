@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, getCurrentAppUser } from "@/lib/auth-server";
-import { generatePortfolioBlueprint } from "@/lib/portfolio-ai";
+import { runPortfolioBuild } from "@/lib/portfolio-builds";
 import { supabaseAdmin } from "@/lib/supabase";
 
 const requestSchema = z.object({
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const { data: portfolio, error: portfolioError } = await supabaseAdmin
     .from("portfolios")
     .select(
-      "uid, slug, name, email, phone, whatsapp, instagram, linkedin, company, designation, headline, about, services, experience, education, website, theme",
+      "uid, slug, name, email, phone, whatsapp, instagram, linkedin, company, designation, headline, about, services, gallery, experience, education, website, theme, address, meeting_link",
     )
     .eq("uid", appUser.uid)
     .single();
@@ -36,7 +36,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Portfolio not found" }, { status: 404 });
   }
 
-  const blueprint = await generatePortfolioBlueprint(portfolio, parsedBody.data.stylePrompt);
+  try {
+    const result = await runPortfolioBuild({
+      portfolio,
+      requestedByUid: appUser.uid,
+      stylePrompt: parsedBody.data.stylePrompt,
+      intakePayload: {
+        source: "dashboard",
+        requestedAt: new Date().toISOString(),
+      },
+    });
 
-  return NextResponse.json({ blueprint });
+    return NextResponse.json({
+      blueprint: result.blueprint,
+      build: result.build,
+      publicUrl: result.publicUrl,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Portfolio build failed" },
+      { status: 500 },
+    );
+  }
 }
