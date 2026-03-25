@@ -1,7 +1,9 @@
+import { OnboardingForm } from "@/components/onboarding-form";
 import { PortfolioAiForm } from "@/components/portfolio-ai-form";
 import { PortfolioPublishControls } from "@/components/portfolio-publish-controls";
 import { SignOutButton } from "@/components/sign-out-button";
 import { requireAuth, getCurrentAppUser } from "@/lib/auth-server";
+import { getOnboardingDefaults } from "@/lib/portfolio-defaults";
 import { getLatestPortfolioBuild } from "@/lib/portfolio-builds";
 import { extractBlueprint } from "@/lib/portfolio-render";
 import { getPortfolioPublicUrl } from "@/lib/portfolio-url";
@@ -22,6 +24,7 @@ export default async function DashboardPage() {
   }
 
   const latestBuild = portfolio && appUser?.uid ? await getLatestPortfolioBuild(appUser.uid) : null;
+  const needsOnboarding = !appUser?.profile_completed;
 
   const blueprint = portfolio ? extractBlueprint({
     uid: appUser?.uid ?? "",
@@ -98,20 +101,38 @@ export default async function DashboardPage() {
           </section>
 
           <section>
-            <PortfolioAiForm defaultPrompt="Make it sleek, premium, mobile-first, and easy to trust within a few seconds." />
-            <article className="page-card mt-6 px-5 py-5 text-sm leading-7 text-[var(--muted)]">
-              Shared onboarding link: <span className="font-semibold text-[var(--foreground)]">/onboarding</span>
-              <br />
-              Send every signed-in user there first. That route saves their profile data, creates a build record, and
-              then runs the AI portfolio generation flow.
-            </article>
-            {blueprint ? (
-              <article className="page-card mt-6 px-5 py-5">
-                <p className="text-sm font-semibold tracking-[0.14em] uppercase text-[var(--brand-deep)]">Latest generated direction</p>
-                <h3 className="mt-3 text-2xl font-semibold">{blueprint.hero.headline}</h3>
-                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{blueprint.summary}</p>
-              </article>
-            ) : null}
+            {needsOnboarding ? (
+              <div className="space-y-4">
+                <article className="page-card px-5 py-5 text-sm leading-7 text-[var(--muted)]">
+                  Complete your onboarding first. As soon as you submit this form, your NFC card profile details,
+                  uploaded assets, and first AI portfolio build will be created from this dashboard itself.
+                </article>
+                <OnboardingForm
+                  defaults={getOnboardingDefaults({
+                    sessionName: session.user.name,
+                    appUserName: appUser?.name,
+                    portfolio,
+                  })}
+                />
+              </div>
+            ) : (
+              <>
+                <PortfolioAiForm defaultPrompt="Make it sleek, premium, mobile-first, and easy to trust within a few seconds." />
+                <article className="page-card mt-6 px-5 py-5 text-sm leading-7 text-[var(--muted)]">
+                  Shared onboarding link: <span className="font-semibold text-[var(--foreground)]">/onboarding</span>
+                  <br />
+                  Send every signed-in user there first. That route saves their profile data, creates a build record,
+                  and then runs the AI portfolio generation flow.
+                </article>
+                {blueprint ? (
+                  <article className="page-card mt-6 px-5 py-5">
+                    <p className="text-sm font-semibold tracking-[0.14em] uppercase text-[var(--brand-deep)]">Latest generated direction</p>
+                    <h3 className="mt-3 text-2xl font-semibold">{blueprint.hero.headline}</h3>
+                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{blueprint.summary}</p>
+                  </article>
+                ) : null}
+              </>
+            )}
           </section>
         </div>
       </section>

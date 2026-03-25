@@ -48,7 +48,7 @@ export async function getCurrentAppUser() {
 
   const { data, error } = await supabaseAdmin
     .from("users")
-    .select("uid, email, name, role, account_status")
+    .select("uid, email, name, role, account_status, profile_completed")
     .eq("uid", appUid)
     .maybeSingle();
 

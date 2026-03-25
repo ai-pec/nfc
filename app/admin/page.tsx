@@ -5,6 +5,30 @@ import { getPortfolioPublicUrl } from "@/lib/portfolio-url";
 import { getSiteMetrics } from "@/lib/supabase-queries";
 import { supabaseAdmin } from "@/lib/supabase";
 
+type AdminPortfolioRelation =
+  | {
+      uid: string;
+      slug: string | null;
+      published: boolean | null;
+      site_paused: boolean | null;
+    }
+  | {
+      uid: string;
+      slug: string | null;
+      published: boolean | null;
+      site_paused: boolean | null;
+    }[]
+  | null
+  | undefined;
+
+function pickPortfolio(relation: AdminPortfolioRelation) {
+  if (Array.isArray(relation)) {
+    return relation[0] ?? null;
+  }
+
+  return relation ?? null;
+}
+
 export default async function AdminPage() {
   const { session } = await requireAdmin();
   const metrics = await getSiteMetrics();
@@ -13,7 +37,10 @@ export default async function AdminPage() {
     .select("uid, email, name, role, account_status, portfolios(uid, slug, published, site_paused)")
     .order("created_at", { ascending: false })
     .limit(8);
-  const portfolioUids = (accounts ?? []).flatMap((account) => account.portfolios?.map((portfolio) => portfolio.uid) ?? []);
+  const portfolioUids = (accounts ?? []).flatMap((account) => {
+    const portfolio = pickPortfolio(account.portfolios as AdminPortfolioRelation);
+    return portfolio?.uid ? [portfolio.uid] : [];
+  });
   const buildLookup = new Map<string, { status: string; requested_at: string | null }>();
 
   if (portfolioUids.length > 0) {
@@ -71,7 +98,7 @@ export default async function AdminPage() {
             <div className="mt-4 space-y-3 text-sm text-[var(--muted)]">
               {(accounts ?? []).map((account) => (
                 (() => {
-                  const portfolio = account.portfolios?.[0];
+                  const portfolio = pickPortfolio(account.portfolios as AdminPortfolioRelation);
 
                   return (
                     <div key={account.uid} className="rounded-2xl border border-[var(--line)] bg-white/70 px-4 py-3">

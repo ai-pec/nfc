@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { supabaseConfig } from "@/lib/supabase-config";
 import { authClient } from "@/lib/auth-client";
 
 type AuthMode = "sign-in" | "sign-up" | "login" | "signup";
@@ -29,32 +28,29 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
     const password = String(formData.get("password") ?? "");
     const name = String(formData.get("name") ?? "");
 
-    const result =
-      normalizedMode === "sign-up"
-        ? await authClient.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                name,
-                full_name: name,
-              },
-              emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
-            },
-          })
-        : await authClient.auth.signInWithPassword({
-            email,
-            password,
-          });
+    const endpoint = normalizedMode === "sign-up" ? "/api/auth/sign-up" : "/api/auth/sign-in";
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        name,
+        nextPath: redirectPath,
+      }),
+    });
+    const result = await response.json();
 
     setPending(false);
 
-    if (result.error) {
-      setError(result.error.message ?? "Authentication failed");
+    if (!response.ok) {
+      setError(result.error ?? "Authentication failed");
       return;
     }
 
-    if (normalizedMode === "sign-up" && !result.data.session) {
+    if (normalizedMode === "sign-up" && result.needsEmailConfirmation) {
       setInfo("Account created. Please check your email and open the confirmation link to finish sign-in.");
       return;
     }
@@ -87,10 +83,8 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
       return;
     }
 
-    const expectedPrefix = `${supabaseConfig.url}/auth/v1/authorize`;
-    if (result.data?.url && !result.data.url.startsWith(expectedPrefix)) {
-      setPending(false);
-      setError("Google authentication URL is invalid. Check Supabase project settings.");
+    if (result.data?.url) {
+      window.location.assign(result.data.url);
     }
   }
 
