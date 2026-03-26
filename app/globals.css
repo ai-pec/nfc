@@ -18,7 +18,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  --font-sans: var(--font-sans);
   --font-mono: "Courier New", monospace;
 }
 
@@ -36,8 +36,9 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: var(--font-sans), sans-serif;
   min-height: 100vh;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -49,7 +50,7 @@ a {
 }
 
 .font-accent {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-accent), serif;
 }
 
 .glass-panel {
@@ -99,6 +100,7 @@ a {
   border: 1px solid var(--line);
   background: rgba(255, 251, 247, 0.82);
   border-radius: 1.5rem;
+  box-shadow: 0 12px 40px rgba(76, 41, 21, 0.06);
 }
 
 @keyframes fadeUp {

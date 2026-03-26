@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getAuthSession, getCurrentAppUser } from "@/lib/auth-server";
 
 const productLinks = [
   { href: "/about", label: "About us" },
@@ -14,7 +15,10 @@ const policyLinks = [
   { href: "/terms", label: "Terms" },
 ];
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const session = await getAuthSession();
+  const appUser = session ? await getCurrentAppUser() : null;
+
   return (
     <footer className="section-shell mt-16 pb-10">
       <div className="glass-panel rounded-[2rem] px-6 py-8 md:px-8">
@@ -49,9 +53,11 @@ export function SiteFooter() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/admin" className="pt-3 text-xs uppercase tracking-[0.16em] text-[var(--muted)]/80">
-                Admin access
-              </Link>
+              {appUser?.role === "admin" ? (
+                <Link href="/admin" className="pt-3 text-xs uppercase tracking-[0.16em] text-[var(--muted)]/80">
+                  Admin access
+                </Link>
+              ) : null}
             </div>
           </div>
         </div>
