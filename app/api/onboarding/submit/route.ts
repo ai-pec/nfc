@@ -16,7 +16,11 @@ export async function POST(request: Request) {
   const parsed = onboardingInputSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid onboarding data" }, { status: 400 });
+    const issue = parsed.error.issues[0];
+    const field = issue?.path?.length ? String(issue.path[0]) : "form";
+    const message = issue?.message ?? "Invalid onboarding data";
+
+    return NextResponse.json({ error: `${field}: ${message}` }, { status: 400 });
   }
 
   const data = normalizeOnboardingInput(parsed.data);

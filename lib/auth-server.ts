@@ -1,8 +1,9 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import { ADMIN_EMAILS } from "@/lib/admin";
+import { hasAdminSession } from "@/lib/admin";
 import { ensureAppUserForAuthUser } from "@/lib/user-sync";
 
 export type AppAuthSession = {
@@ -13,7 +14,7 @@ export type AppAuthSession = {
   };
 };
 
-export async function getAuthSession() {
+export const getAuthSession = cache(async () => {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getUser();
 
@@ -31,9 +32,9 @@ export async function getAuthSession() {
         null,
     },
   } satisfies AppAuthSession;
-}
+});
 
-export async function getCurrentAppUser() {
+export const getCurrentAppUser = cache(async () => {
   const session = await getAuthSession();
 
   if (!session?.user?.id || !session.user.email) {
@@ -57,7 +58,7 @@ export async function getCurrentAppUser() {
   }
 
   return data;
-}
+});
 
 export async function requireAuth() {
   const session = await getAuthSession();
@@ -72,12 +73,10 @@ export async function requireAuth() {
 export async function requireAdmin() {
   const session = await requireAuth();
   const appUser = await getCurrentAppUser();
-
-  const allowlisted = session.user.email ? ADMIN_EMAILS.includes(session.user.email.toLowerCase()) : false;
-  const isAdmin = allowlisted || appUser?.role === "admin";
+  const isAdmin = await hasAdminSession(appUser?.uid);
 
   if (!isAdmin) {
-    redirect("/");
+    redirect("/admin");
   }
 
   return { session, appUser };

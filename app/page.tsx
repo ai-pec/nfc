@@ -68,13 +68,13 @@ export default function Home() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/buy"
-                className="rounded-full bg-[var(--brand)] px-6 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-deep)]"
+                className="rounded-full bg-[#bc5a2d] px-6 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-[#7e3110]"
               >
                 Buy your NFC card
               </Link>
               <Link
                 href="/about"
-                className="rounded-full border border-[var(--brand-strong)] bg-white/90 px-6 py-3 text-center text-sm font-semibold text-[var(--brand-deep)] transition-colors hover:bg-[var(--surface-strong)]"
+                className="rounded-full border border-[#8f3a16] bg-white/90 px-6 py-3 text-center text-sm font-semibold text-[#7e3110] transition-colors hover:bg-[#fff7f1]"
               >
                 See how it works
               </Link>
@@ -191,24 +191,25 @@ export default function Home() {
                 key={plan.name}
                 className={`rounded-[1.75rem] border p-6 ${
                   index === 1
-                    ? "border-[var(--brand-strong)] bg-[var(--foreground)] text-white"
-                    : "border-[var(--line)] bg-[rgba(255,251,247,0.84)]"
+                    ? "border-[#8f3a16] text-white shadow-[0_24px_70px_rgba(126,49,16,0.28)]"
+                    : "border-[rgba(109,87,74,0.18)] bg-[rgba(255,251,247,0.84)]"
                 }`}
+                style={index === 1 ? { background: "linear-gradient(180deg, #7e3110, #5c2108)" } : undefined}
               >
                 <p
                   className={`text-sm font-semibold tracking-[0.14em] uppercase ${
-                    index === 1 ? "text-white/68" : "text-[var(--brand-deep)]"
+                    index === 1 ? "text-white/70" : "text-[#7e3110]"
                   }`}
                 >
                   {plan.name}
                 </p>
-                <p className="mt-4 text-4xl font-semibold">{plan.price}</p>
-                <p className={`mt-4 text-sm leading-6 ${index === 1 ? "text-white/76" : "text-[var(--muted)]"}`}>
+                <p className={`mt-4 text-4xl font-semibold ${index === 1 ? "text-white" : "text-[#16110d]"}`}>{plan.price}</p>
+                <p className={`mt-4 text-sm leading-6 ${index === 1 ? "text-white/80" : "text-[#6f6259]"}`}>
                   {plan.description}
                 </p>
                 <div className="mt-5 space-y-3">
                   {plan.features.map((feature) => (
-                    <div key={feature} className={`text-sm ${index === 1 ? "text-white/88" : "text-[var(--muted)]"}`}>
+                    <div key={feature} className={`text-sm ${index === 1 ? "text-white/90" : "text-[#6f6259]"}`}>
                       {feature}
                     </div>
                   ))}
@@ -217,8 +218,8 @@ export default function Home() {
                   href="/buy"
                   className={`mt-6 inline-flex rounded-full px-5 py-3 text-sm font-semibold ${
                     index === 1
-                      ? "bg-white text-[var(--foreground)]"
-                      : "bg-[var(--brand)] text-white hover:bg-[var(--brand-deep)]"
+                      ? "bg-white text-[#7e3110] hover:bg-gray-100"
+                      : "bg-[#bc5a2d] text-white hover:bg-[#7e3110]"
                   }`}
                 >
                   Choose {plan.name}

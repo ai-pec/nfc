@@ -1,13 +1,13 @@
 export const pricingPlans = [
   {
     name: "Solo",
-    price: "₹999",
+    price: "Rs 999",
     description: "For freelancers and creators who need one elegant NFC profile card.",
     features: ["One NFC card", "Hosted profile", "Social links and contact actions"],
   },
   {
     name: "Pro",
-    price: "₹1,999",
+    price: "Rs 1,999",
     description: "For professionals who want media, lead capture, and a stronger first impression.",
     features: ["Premium card finish", "Portfolio sections", "Private document sharing flow"],
   },
@@ -17,7 +17,7 @@ export const pricingPlans = [
     description: "For agencies, sales teams, and companies deploying cards across multiple people.",
     features: ["Bulk provisioning", "Subdomain management", "Admin controls and review flow"],
   },
-];
+] as const;
 
 export const faqs = [
   {
@@ -36,4 +36,4 @@ export const faqs = [
     question: "Can companies manage multiple users?",
     answer: "Yes. The roadmap includes admin moderation tools for account edits, pauses, and hosted-site control.",
   },
-];
+] as const;

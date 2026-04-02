@@ -93,6 +93,11 @@ export function OnboardingForm({ defaults }: OnboardingFormProps) {
         publicUrl: data.publicUrl ?? null,
         build: data.build,
       });
+
+      // Redirect to dashboard after successful onboarding
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 2500);
     } catch (submissionError) {
       setPending(false);
       setError(submissionError instanceof Error ? submissionError.message : "Unable to save onboarding details");
@@ -331,19 +336,23 @@ export function OnboardingForm({ defaults }: OnboardingFormProps) {
       {error ? <p className="text-sm text-[var(--brand-deep)]">{error}</p> : null}
 
       {result ? (
-        <div className="page-card px-5 py-4 text-sm leading-7 text-[var(--muted)]">
-          Build created: <span className="font-semibold text-[var(--foreground)]">{result.build.id}</span>
-          <br />
-          Status: <span className="font-semibold text-[var(--foreground)]">{result.build.status}</span>
-          <br />
-          Public URL:{" "}
+        <div className="rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm leading-7">
+          <p className="font-semibold text-green-800">Portfolio setup complete!</p>
+          <p className="mt-2 text-green-700">
+            Build ID: <span className="font-mono">{result.build.id}</span>
+          </p>
+          <p className="text-green-700">
+            Status: <span className="capitalize">{result.build.status}</span>
+          </p>
           {result.publicUrl ? (
-            <a href={result.publicUrl} target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-deep)]">
-              {result.publicUrl}
-            </a>
-          ) : (
-            "Will appear after publishing"
-          )}
+            <p className="text-green-700">
+              Public URL:{" "}
+              <a href={result.publicUrl} target="_blank" rel="noreferrer" className="font-medium underline">
+                {result.publicUrl}
+              </a>
+            </p>
+          ) : null}
+          <p className="mt-3 text-green-600">Redirecting to your dashboard...</p>
         </div>
       ) : null}
 

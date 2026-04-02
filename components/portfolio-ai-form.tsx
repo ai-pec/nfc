@@ -4,16 +4,25 @@ import { useState } from "react";
 
 type GeneratedBlueprint = {
   theme: string;
+  layout_template: string;
   hero: {
     headline: string;
     subheadline: string;
   };
+  summary: string;
   sections: Array<{
+    id: string;
     type: string;
+    variant: string;
     title: string;
     items: string[];
   }>;
-  invariants: string[];
+  cta_bar: {
+    primary: {
+      action: string;
+      label: string;
+    };
+  };
   source: string;
 };
 
@@ -107,9 +116,11 @@ export function PortfolioAiForm({ defaultPrompt }: PortfolioAiFormProps) {
       {blueprint ? (
         <div className="mt-6 space-y-4">
           <div className="page-card px-5 py-4">
-            <p className="text-sm font-semibold tracking-[0.14em] uppercase text-[var(--brand-deep)]">{blueprint.theme}</p>
+            <p className="text-sm font-semibold tracking-[0.14em] uppercase text-[var(--brand-deep)]">
+              {blueprint.theme} / {blueprint.layout_template}
+            </p>
             <h3 className="mt-2 text-2xl font-semibold">{blueprint.hero.headline}</h3>
-            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{blueprint.hero.subheadline}</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{blueprint.summary}</p>
             <p className="mt-3 text-xs uppercase tracking-[0.14em] text-[var(--muted)]">Source: {blueprint.source}</p>
           </div>
 

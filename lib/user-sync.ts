@@ -1,4 +1,3 @@
-import { ADMIN_EMAILS } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase";
 
 type AuthIdentityUser = {
@@ -32,18 +31,18 @@ async function createUniqueSlug(name: string) {
 
 export async function ensureAppUserForAuthUser(user: AuthIdentityUser) {
   const normalizedEmail = user.email.trim().toLowerCase();
-  const role = ADMIN_EMAILS.includes(normalizedEmail) ? "admin" : "user";
+  const role = "user";
 
   let existingUser = await supabaseAdmin
     .from("users")
-    .select("uid, role, supabase_auth_user_id")
+    .select("uid, email, name, role, supabase_auth_user_id")
     .eq("supabase_auth_user_id", user.id)
     .maybeSingle();
 
   if (!existingUser.data && !existingUser.error) {
     existingUser = await supabaseAdmin
       .from("users")
-      .select("uid, role, supabase_auth_user_id")
+      .select("uid, email, name, role, supabase_auth_user_id")
       .eq("email", normalizedEmail)
       .maybeSingle();
   }
@@ -73,20 +72,29 @@ export async function ensureAppUserForAuthUser(user: AuthIdentityUser) {
 
     appUid = insertedUser.data.uid as string;
   } else {
-    const updatedUser = await supabaseAdmin
-      .from("users")
-      .update({
-        email: normalizedEmail,
-        name: user.name ?? normalizedEmail.split("@")[0],
-        supabase_auth_user_id: user.id,
-        role,
-      })
-      .eq("uid", appUid)
-      .select("uid")
-      .single();
+    const nextName = user.name ?? normalizedEmail.split("@")[0];
+    const needsUserRefresh =
+      existingUser.data.email !== normalizedEmail ||
+      existingUser.data.name !== nextName ||
+      existingUser.data.supabase_auth_user_id !== user.id ||
+      existingUser.data.role !== role;
 
-    if (updatedUser.error) {
-      throw updatedUser.error;
+    if (needsUserRefresh) {
+      const updatedUser = await supabaseAdmin
+        .from("users")
+        .update({
+          email: normalizedEmail,
+          name: nextName,
+          supabase_auth_user_id: user.id,
+          role,
+        })
+        .eq("uid", appUid)
+        .select("uid")
+        .single();
+
+      if (updatedUser.error) {
+        throw updatedUser.error;
+      }
     }
   }
 

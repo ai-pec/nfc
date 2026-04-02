@@ -7,7 +7,7 @@ function splitMultiline(value: string) {
     .filter(Boolean);
 }
 
-const optionalUrl = z.union([z.literal(""), z.string().url()]).transform((value) => value || "");
+const optionalText = z.string().max(500).optional().default("");
 const uploadedDocumentSchema = z.object({
   bucket: z.string(),
   path: z.string(),
@@ -24,10 +24,10 @@ export const onboardingInputSchema = z.object({
   designation: z.string().max(120).optional().default(""),
   headline: z.string().max(140).optional().default(""),
   about: z.string().min(40).max(1200),
-  website: optionalUrl.optional().default(""),
-  instagram: optionalUrl.optional().default(""),
-  linkedin: optionalUrl.optional().default(""),
-  meetingLink: optionalUrl.optional().default(""),
+  website: optionalText,
+  instagram: optionalText,
+  linkedin: optionalText,
+  meetingLink: optionalText,
   address: z.string().max(220).optional().default(""),
   servicesText: z.string().max(1200).optional().default(""),
   experienceText: z.string().max(1500).optional().default(""),

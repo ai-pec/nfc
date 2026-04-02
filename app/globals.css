@@ -103,6 +103,91 @@ a {
   box-shadow: 0 12px 40px rgba(76, 41, 21, 0.06);
 }
 
+.portfolio-shell {
+  --portfolio-bg: linear-gradient(180deg, rgba(255, 250, 245, 0.96), rgba(247, 239, 230, 0.98));
+  --portfolio-surface: rgba(255, 252, 248, 0.82);
+  --portfolio-surface-strong: rgba(255, 255, 255, 0.92);
+  --portfolio-line: rgba(126, 86, 58, 0.14);
+  --portfolio-text: #17120e;
+  --portfolio-muted: #6d6056;
+  --portfolio-accent: #b85d32;
+  --portfolio-accent-strong: #823413;
+  --portfolio-chip: rgba(184, 93, 50, 0.1);
+  color: var(--portfolio-text);
+}
+
+.portfolio-shell[data-portfolio-mode="dark"] {
+  --portfolio-bg: linear-gradient(180deg, rgba(18, 16, 15, 0.98), rgba(36, 30, 27, 0.98));
+  --portfolio-surface: rgba(34, 28, 26, 0.84);
+  --portfolio-surface-strong: rgba(43, 36, 33, 0.96);
+  --portfolio-line: rgba(255, 233, 215, 0.1);
+  --portfolio-text: #f6efe8;
+  --portfolio-muted: rgba(246, 239, 232, 0.72);
+  --portfolio-accent: #f1a36f;
+  --portfolio-accent-strong: #f7bb90;
+  --portfolio-chip: rgba(241, 163, 111, 0.14);
+}
+
+.portfolio-panel {
+  background: var(--portfolio-bg);
+  color: var(--portfolio-text);
+  border: 1px solid var(--portfolio-line);
+  box-shadow: 0 28px 90px rgba(28, 19, 13, 0.18);
+}
+
+.portfolio-card {
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-line);
+  box-shadow: 0 18px 48px rgba(28, 19, 13, 0.08);
+  color: var(--portfolio-text);
+}
+
+.portfolio-card-strong {
+  background: var(--portfolio-surface-strong);
+  border: 1px solid var(--portfolio-line);
+  color: var(--portfolio-text);
+}
+
+.portfolio-muted {
+  color: var(--portfolio-muted);
+}
+
+.portfolio-chip {
+  background: var(--portfolio-chip);
+  color: var(--portfolio-accent-strong);
+  border: 1px solid color-mix(in srgb, var(--portfolio-accent) 22%, transparent);
+}
+
+.portfolio-button-primary {
+  background: linear-gradient(135deg, var(--portfolio-accent), var(--portfolio-accent-strong));
+  color: white;
+  box-shadow: 0 14px 32px rgba(126, 49, 16, 0.2);
+}
+
+.portfolio-button-secondary {
+  background: transparent;
+  border: 1px solid var(--portfolio-line);
+  color: var(--portfolio-text);
+}
+
+.portfolio-toggle {
+  margin-bottom: 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--portfolio-line);
+  background: var(--portfolio-surface);
+  color: var(--portfolio-text);
+  padding: 0.7rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.portfolio-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;

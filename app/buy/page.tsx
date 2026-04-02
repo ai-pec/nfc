@@ -22,7 +22,7 @@ export default function BuyPage() {
               key={plan.name}
               className={`rounded-[1.75rem] border p-6 ${
                 index === 1
-                  ? "border-[var(--brand-strong)] bg-[var(--foreground)] text-white"
+                  ? "border-[var(--brand-strong)] bg-[linear-gradient(180deg,var(--brand-deep),#5c2108)] text-white shadow-[0_24px_70px_rgba(126,49,16,0.28)]"
                   : "border-[var(--line)] bg-[rgba(255,251,247,0.84)]"
               }`}
             >
@@ -42,10 +42,11 @@ export default function BuyPage() {
               </div>
               <Link
                 href="/contact"
+                style={{ color: index === 1 ? 'var(--brand-deep)' : 'white' }}
                 className={`mt-6 inline-flex rounded-full px-5 py-3 text-sm font-semibold ${
                   index === 1
-                    ? "bg-white text-[var(--foreground)]"
-                    : "bg-[var(--brand)] text-white hover:bg-[var(--brand-deep)]"
+                    ? "bg-white hover:bg-gray-50"
+                    : "bg-[var(--brand)] hover:bg-[var(--brand-deep)]"
                 }`}
               >
                 Start with {plan.name}
